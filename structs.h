@@ -1,3 +1,6 @@
+/**
+ * Defines a structure that represents a Pokemon.
+*/
 typedef struct pokemon {
     char pokedexIndex;          //Offset: 0x00
     char type1;                 //Offset: 0x05
@@ -10,12 +13,18 @@ typedef struct pokemon {
     short stats[5];             //Offset: 0x22
 };
 
+/**
+ * Defines a structure that represents a Pokemon party.
+*/
 typedef struct party {
     char numPokemon;            //Offset: 0x2F2C
     struct pokemon mons[6];     //Offset: 0x2F34
     char nicknames[6][10];      //Offset: 0x307E
 };
 
+/**
+ * Defines a structure that represents the data associated with a player.
+*/
 typedef struct savProfile {
     char playerName[7];         //Offset: 0x2598
     char money[3];              //Offset: 0x25F3
