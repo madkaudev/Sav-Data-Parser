@@ -25,7 +25,7 @@ typedef struct party {
 /**
  * Defines a structure that represents the data associated with a player.
 */
-typedef struct savProfile {
+typedef struct player {
     char playerName[7];         //Offset: 0x2598
     char money[3];              //Offset: 0x25F3
     char badges;                //Offset: 0x2602

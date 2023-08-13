@@ -2,49 +2,27 @@
 #include <stdlib.h>
 
 #include "structs.h"
+#include "printHexFunctions.h"
 #include "freqFunctions.h"
 
 /**
- * Outputs the data of the .sav file in an external file.
+ * Fills the player struct with hex values from the charcter savFile array.
  * 
- * @param FILE *fPtr
+ * @param player *p1
  * @param char *savFile
- * @param int size
  * @return void
 */
-void printHexData(FILE *fPtr, char *savFile, int size) {
-    //Index variables
-    int index = 0;
-    int verticalIndex = 0x0000;
-    int horizontalIndex = 0x00;
-
-    // Prints out the header
-    fprintf(fPtr, "         ");
-    for (int i = 0; i < 16; i++) {
-        fprintf(fPtr, "%02X", horizontalIndex);
-        if (horizontalIndex == 15) {
-            fprintf(fPtr, "\n");
-        }
-        else {
-            fprintf(fPtr, "  ");
-        }
-        horizontalIndex++;
-        
-    }
-    // Prints out the rows
-    for (int i = 0; i < size/16; i++) {
-        fprintf(fPtr, "0x%04X   ", verticalIndex);
-        for (int j = 0; j < 16; j++) {
-            fprintf(fPtr, "%.*X", 2, savFile[index]);
-            if (j == 15) {
-                fprintf(fPtr, "\n");
-            }
-            else {
-                fprintf(fPtr, "  ");
-            }
-            index++;
-        }
-        verticalIndex += 16;
+void fillPlayer(struct player *p1, char *savFile) {
+    int pIndex = 0;
+    int index = 0x2598;
+    char c = savFile[index];
+    char check = (char)0x50;
+    while (c != check) {
+        p1->playerName[pIndex] = c;
+        printf("%X ", c);
+        pIndex++;
+        index++;
+        c = savFile[index];
     }
 }
 
@@ -68,10 +46,6 @@ int main() {
         exit(1);
     }
 
-    /* Open the file. */
-    FILE *fPtr;
-    fPtr = openFile(fPtr, filePath, "rb");
-
     /* Allocate an array of 8kb to store .sav file length. */
     char *savFile = (char *)calloc(SAV_SIZE, sizeof(char));
 
@@ -82,6 +56,10 @@ int main() {
         free(filePath);
         exit(1);
     }
+
+    /* Open the file. */
+    FILE *fPtr;
+    fPtr = openFile(fPtr, filePath, "rb");
 
     /* Fill array with hex bytes. */
     const size_t freadSize = fread(savFile, sizeof(char), SAV_SIZE, fPtr);
@@ -95,6 +73,8 @@ int main() {
     }
     printf("File was properly read.\n");
 
+    formatArray(savFile, SAV_SIZE);
+
     /* Prompt user for a name for the output file. */
     char *outputFilePath = (char*)calloc(_MAX_PATH, sizeof(char));
 
@@ -102,6 +82,9 @@ int main() {
     int ofpCheck = cPtrCallocCheck(outputFilePath);
     if (ofpCheck == 0) {
         printf("Couldn't allocate memory for the file path.\n");
+        free(filePath);
+        free(savFile);
+        fclose(fPtr);
         exit(1);
     }
 
@@ -112,6 +95,11 @@ int main() {
     ofPtr = openFile(ofPtr, filePath, "w");
     printHexData(ofPtr, savFile, SAV_SIZE);
     printf("Finished writing to the file!\n");
+
+    /* Create a structure to hold the player's profile. */
+    struct player playerProfile;
+
+    fillPlayer(&playerProfile, savFile);
 
     /* Free all the allocated memory. */
     free(filePath);
